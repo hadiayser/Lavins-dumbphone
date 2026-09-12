@@ -1,0 +1,1113 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover, user-scalable=no">
+<title>Lavin's phone</title>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Lavin's phone">
+<meta name="theme-color" content="#7A2E3F">
+<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='22' fill='%237A2E3F'/%3E%3Crect x='24' y='16' width='52' height='68' rx='10' fill='%23EFE3CD' stroke='%233A1620' stroke-width='3'/%3E%3Ccircle cx='50' cy='74' r='4' fill='%233A1620'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=VT323&family=Baloo+2:wght@500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --shell:#7A2E3F;
+    --shell-dark:#5E2231;
+    --shell-darker:#431825;
+    --gold:#C9A15A;
+    --gold-dark:#AD8646;
+    --cream:#F5EBDA;
+    --ink:#3A1620;
+    --lcd-bg:#EFE3CD;
+    --lcd-bg-deep:#E3D3AE;
+    --lcd-fg:#4A2030;
+    --coral:#B4523F;
+    --coral-dark:#963F2F;
+  }
+  *{box-sizing:border-box; -webkit-tap-highlight-color: transparent;}
+  html,body{margin:0;padding:0;height:100%;}
+  body{
+    background:
+      radial-gradient(circle at 20% 15%, #FFF7EC 0%, var(--cream) 45%, #F1E4D0 100%);
+    font-family:'Baloo 2', sans-serif;
+    color:var(--ink);
+    min-height:100dvh;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:18px;
+    overflow:hidden;
+  }
+
+  .phone{
+    width:100%;
+    max-width:380px;
+    height:min(780px, 96dvh);
+    background: linear-gradient(160deg, var(--shell) 0%, var(--shell-dark) 78%, var(--shell-darker) 100%);
+    border-radius:46px;
+    padding:20px 18px 24px;
+    display:flex;
+    flex-direction:column;
+    gap:14px;
+    box-shadow:
+      0 30px 60px -20px rgba(74,52,32,0.45),
+      inset 0 2px 0 rgba(255,255,255,0.35),
+      inset 0 -6px 14px rgba(0,0,0,0.12);
+    position:relative;
+  }
+
+  .phone::before{
+    content:"";
+    position:absolute;
+    top:14px; left:50%; transform:translateX(-50%);
+    width:70px; height:6px; border-radius:6px;
+    background:rgba(74,52,32,0.18);
+  }
+
+  .speaker{
+    display:flex;
+    justify-content:center;
+    gap:5px;
+    margin-top:14px;
+  }
+  .speaker span{
+    width:5px;height:5px;border-radius:50%;
+    background:rgba(74,52,32,0.28);
+  }
+
+  .screen{
+    flex:1;
+    background: linear-gradient(180deg, var(--lcd-bg) 0%, var(--lcd-bg-deep) 100%);
+    border-radius:26px;
+    border:7px solid var(--ink);
+    box-shadow: inset 0 3px 10px rgba(0,0,0,0.25), inset 0 0 0 3px rgba(255,255,255,0.15);
+    padding:16px 14px;
+    position:relative;
+    overflow:hidden;
+    color:var(--lcd-fg);
+    display:flex;
+    flex-direction:column;
+  }
+
+  /* subtle scanline texture for LCD feel */
+  .screen::after{
+    content:"";
+    position:absolute; inset:0;
+    background:repeating-linear-gradient(
+      to bottom,
+      rgba(55,69,46,0.05) 0px,
+      rgba(55,69,46,0.05) 1px,
+      transparent 1px,
+      transparent 3px
+    );
+    pointer-events:none;
+  }
+
+  .view{ display:none; flex-direction:column; height:100%; }
+  .view.active{ display:flex; }
+
+  /* ---------- Home / status ---------- */
+  .carrier{
+    font-family:'Baloo 2', sans-serif;
+    font-weight:700;
+    font-size:13px;
+    text-align:center;
+    opacity:0.7;
+    margin-bottom:6px;
+  }
+
+  .status-row{
+    display:flex;
+    justify-content:space-between;
+    align-items:baseline;
+    font-family:'VT323', monospace;
+    font-size:17px;
+    letter-spacing:0.5px;
+    opacity:0.85;
+    margin-bottom:2px;
+  }
+
+  .clock{
+    text-align:center;
+    margin:2px 0 10px;
+  }
+  .clock .time{
+    font-family:'VT323', monospace;
+    font-size:52px;
+    line-height:1;
+    letter-spacing:2px;
+  }
+  .clock .date{
+    font-family:'Baloo 2', sans-serif;
+    font-weight:600;
+    font-size:13px;
+    text-transform:capitalize;
+    opacity:0.85;
+    margin-top:2px;
+  }
+
+  .weather-mini{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:6px;
+    font-family:'VT323', monospace;
+    font-size:18px;
+    opacity:0.9;
+  }
+  .weather-mini .ic{ font-size:18px; }
+
+  .bus-mini{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:6px;
+    font-family:'VT323', monospace;
+    font-size:16px;
+    margin-bottom:10px;
+    opacity:0.85;
+    cursor:pointer;
+  }
+  .bus-mini .ic{ font-size:16px; }
+
+  /* ---------- Setup notice (used when something needs your details) ---------- */
+  .setup-note{
+    flex:1;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    text-align:center;
+    gap:10px;
+    font-family:'Baloo 2', sans-serif;
+    font-size:13px;
+    opacity:0.85;
+    padding:0 10px;
+  }
+  .setup-note .big{ font-size:30px; }
+
+  /* ---------- Phone / favorites view ---------- */
+  .fav-grid{
+    display:flex;
+    flex-direction:column;
+    gap:8px;
+    flex:1;
+    overflow-y:auto;
+  }
+  .fav-btn{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    background:rgba(255,255,255,0.4);
+    border:2px solid rgba(55,69,46,0.3);
+    border-radius:14px;
+    padding:10px 12px;
+    font-family:'Baloo 2', sans-serif;
+    font-weight:700;
+    font-size:15px;
+    color:var(--lcd-fg);
+    text-decoration:none;
+  }
+  .fav-btn:active{ background:rgba(255,255,255,0.65); }
+  .fav-btn .avatar{
+    width:34px; height:34px; border-radius:50%;
+    background: linear-gradient(160deg, var(--gold) 0%, var(--gold-dark) 100%);
+    display:flex; align-items:center; justify-content:center;
+    font-size:15px; color:var(--cream); flex-shrink:0;
+  }
+  .fav-btn small{ display:block; font-weight:600; font-size:11px; opacity:0.75; }
+  .dial-btn{
+    margin-top:auto;
+    text-align:center;
+    padding:10px;
+    border-radius:14px;
+    border:2px dashed rgba(55,69,46,0.35);
+    font-family:'Baloo 2', sans-serif;
+    font-weight:700;
+    font-size:13px;
+    color:var(--lcd-fg);
+    text-decoration:none;
+  }
+
+  /* ---------- Emergency view ---------- */
+  .emergency-grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:10px;
+    flex:1;
+  }
+  .emergency-btn{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    gap:4px;
+    border-radius:18px;
+    text-decoration:none;
+    font-family:'Baloo 2', sans-serif;
+    color:#fff;
+    padding:10px;
+  }
+  .emergency-btn .num{ font-family:'VT323', monospace; font-size:34px; line-height:1; }
+  .emergency-btn .lbl{ font-weight:700; font-size:13px; }
+  .em-politi{ background:#3A4C7A; }
+  .em-brann{ background:#B4523F; }
+  .em-ambulanse{ background:#963F2F; }
+  .em-legevakt{ background:#6E5A3E; }
+
+  /* ---------- Shopping list view ---------- */
+  .list-add-row{
+    display:flex;
+    gap:6px;
+    margin-bottom:10px;
+  }
+  .list-add-row input{
+    flex:1;
+    border:2px solid rgba(55,69,46,0.35);
+    border-radius:10px;
+    background:rgba(255,255,255,0.5);
+    padding:8px 10px;
+    font-family:'Baloo 2', sans-serif;
+    font-size:14px;
+    color:var(--lcd-fg);
+  }
+  .list-add-row input:focus{ outline:none; }
+  .list-add-row button{
+    border:none;
+    border-radius:10px;
+    background: linear-gradient(160deg, var(--gold) 0%, var(--gold-dark) 100%);
+    color:var(--cream);
+    font-weight:800;
+    font-size:18px;
+    width:40px;
+    cursor:pointer;
+  }
+  .list-items{
+    list-style:none;
+    margin:0; padding:0;
+    flex:1;
+    overflow-y:auto;
+    display:flex;
+    flex-direction:column;
+    gap:6px;
+  }
+  .list-items li{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    background:rgba(255,255,255,0.35);
+    border-radius:10px;
+    padding:8px 10px;
+    font-family:'Baloo 2', sans-serif;
+    font-size:14px;
+  }
+  .list-items li.checked{ opacity:0.5; text-decoration:line-through; }
+  .list-items .chk{
+    width:18px; height:18px; border-radius:50%;
+    border:2px solid var(--lcd-fg);
+    flex-shrink:0;
+  }
+  .list-items li.checked .chk{ background:var(--lcd-fg); }
+  .list-items .del{ margin-left:auto; opacity:0.5; font-size:13px; }
+  .list-empty{ text-align:center; opacity:0.6; font-size:13px; margin-top:20px; }
+
+  /* ---------- Timer view ---------- */
+  .timer-display{
+    text-align:center;
+    font-family:'VT323', monospace;
+    font-size:64px;
+    line-height:1;
+    margin:6px 0 14px;
+  }
+  .timer-presets{
+    display:grid;
+    grid-template-columns:repeat(5, 1fr);
+    gap:6px;
+    margin-bottom:12px;
+  }
+  .timer-presets button{
+    border:2px solid rgba(55,69,46,0.3);
+    background:rgba(255,255,255,0.4);
+    border-radius:10px;
+    padding:8px 0;
+    font-family:'Baloo 2', sans-serif;
+    font-weight:700;
+    font-size:12px;
+    color:var(--lcd-fg);
+    cursor:pointer;
+  }
+  .timer-controls{
+    display:flex;
+    gap:8px;
+    margin-top:auto;
+  }
+  .timer-controls button{
+    flex:1;
+    border:none;
+    border-radius:12px;
+    padding:12px 0;
+    font-family:'Baloo 2', sans-serif;
+    font-weight:800;
+    font-size:14px;
+    cursor:pointer;
+    color:var(--cream);
+  }
+  #timer-start{ background: linear-gradient(160deg, var(--gold) 0%, var(--gold-dark) 100%); }
+  #timer-reset{ background: rgba(74,22,32,0.5); }
+  .timer-note{ text-align:center; font-size:11px; opacity:0.6; margin-top:8px; }
+
+  /* ---------- Forecast row (weather view) ---------- */
+  .forecast-row{
+    display:flex;
+    justify-content:space-around;
+    padding-top:10px;
+    margin-top:10px;
+    border-top:2px dashed rgba(55,69,46,0.3);
+  }
+  .forecast-day{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:2px;
+    font-family:'Baloo 2', sans-serif;
+    font-size:11px;
+  }
+  .forecast-day .ic{ font-size:18px; }
+  .forecast-day .hi{ font-family:'VT323', monospace; font-size:16px; }
+  .forecast-day .lo{ font-family:'VT323', monospace; font-size:13px; opacity:0.65; }
+
+  .app-grid{
+    flex:1;
+    display:grid;
+    grid-template-columns:repeat(3, 1fr);
+    gap:10px;
+    align-content:start;
+  }
+
+  .app-key{
+    background: rgba(255,255,255,0.35);
+    border: 2px solid rgba(55,69,46,0.35);
+    border-radius:16px;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    gap:4px;
+    padding:10px 4px 8px;
+    cursor:pointer;
+    font-family:'Baloo 2', sans-serif;
+    font-weight:700;
+    font-size:11px;
+    color:var(--lcd-fg);
+    transition:transform .08s ease, background .15s ease;
+    text-align:center;
+  }
+  .app-key:active{
+    transform:scale(0.93);
+    background:rgba(255,255,255,0.6);
+  }
+  .app-key svg{ width:26px; height:26px; }
+
+  /* ---------- Back header for subviews ---------- */
+  .subview-header{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    margin-bottom:12px;
+    font-family:'Baloo 2', sans-serif;
+    font-weight:800;
+    font-size:16px;
+  }
+  .subview-header svg{ width:20px; height:20px; }
+
+  /* ---------- Weather view ---------- */
+  .weather-big{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    flex:1;
+    gap:6px;
+  }
+  .weather-big .emoji{ font-size:54px; }
+  .weather-big .temp{
+    font-family:'VT323', monospace;
+    font-size:56px;
+    line-height:1;
+  }
+  .weather-big .desc{
+    font-family:'Baloo 2', sans-serif;
+    font-weight:600;
+    font-size:14px;
+    text-transform:capitalize;
+    opacity:0.85;
+  }
+  .weather-sub{
+    display:flex;
+    justify-content:space-around;
+    font-family:'VT323', monospace;
+    font-size:16px;
+    padding-top:10px;
+    border-top:2px dashed rgba(55,69,46,0.3);
+    margin-top:10px;
+  }
+
+  /* ---------- Calculator view ---------- */
+  .calc-display{
+    font-family:'VT323', monospace;
+    font-size:38px;
+    text-align:right;
+    padding:8px 6px;
+    margin-bottom:10px;
+    min-height:46px;
+    overflow-x:auto;
+    white-space:nowrap;
+    border-bottom:2px dashed rgba(55,69,46,0.3);
+  }
+  .calc-grid{
+    flex:1;
+    display:grid;
+    grid-template-columns:repeat(4, 1fr);
+    gap:7px;
+  }
+  .calc-key{
+    background:rgba(255,255,255,0.4);
+    border:2px solid rgba(55,69,46,0.3);
+    border-radius:12px;
+    font-family:'Baloo 2', sans-serif;
+    font-weight:700;
+    font-size:16px;
+    color:var(--lcd-fg);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    cursor:pointer;
+  }
+  .calc-key:active{ transform:scale(0.92); background:rgba(255,255,255,0.65); }
+  .calc-key.op{ background:rgba(180,82,63,0.35); }
+  .calc-key.wide{ grid-column:span 2; }
+
+  /* ---------- Soft keys under screen ---------- */
+  .softkeys{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:2px 10px;
+  }
+  .softkey{
+    background:none;
+    border:none;
+    font-family:'Baloo 2', sans-serif;
+    font-weight:700;
+    font-size:13px;
+    color:rgba(74,52,32,0.75);
+    padding:6px 4px;
+    cursor:pointer;
+  }
+  .home-btn{
+    width:46px; height:46px;
+    border-radius:50%;
+    background: linear-gradient(160deg, var(--gold) 0%, var(--gold-dark) 100%);
+    border:2px solid rgba(74,52,32,0.25);
+    box-shadow: inset 0 2px 0 rgba(255,255,255,0.4), 0 3px 6px rgba(0,0,0,0.15);
+    cursor:pointer;
+  }
+
+  .credit{
+    text-align:center;
+    font-size:10px;
+    color:rgba(74,52,32,0.4);
+    margin-top:2px;
+  }
+</style>
+</head>
+<body>
+
+<div class="phone">
+  <div class="speaker"><span></span><span></span><span></span><span></span><span></span></div>
+
+  <div class="screen">
+
+    <!-- HOME VIEW -->
+    <div id="view-home" class="view active">
+      <div class="carrier">Lavin's phone</div>
+      <div class="status-row">
+        <span id="status-time">--:--</span>
+        <span id="status-batt">🔋</span>
+      </div>
+      <div class="clock">
+        <div class="time" id="clock-time">--:--</div>
+        <div class="date" id="clock-date">-</div>
+      </div>
+      <div class="weather-mini" id="weather-mini">
+        <span class="ic">⛅</span><span id="weather-mini-text">Henter vær …</span>
+      </div>
+      <div class="bus-mini" id="bus-mini" data-action="app" data-app="ruter://" data-url="https://ruter.no">
+        <span class="ic">🚌</span><span id="bus-mini-text">Henter avganger …</span>
+      </div>
+
+      <div class="app-grid">
+        <div class="app-key" data-action="app" data-app="comgooglemaps://" data-url="https://maps.google.com">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s7-7.58 7-13A7 7 0 0 0 5 9c0 5.42 7 13 7 13z"/><circle cx="12" cy="9" r="2.5"/></svg>
+          Kart
+        </div>
+
+        <div class="app-key" data-action="app" data-app="ruter://" data-url="https://ruter.no">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="5" width="16" height="12" rx="2.5"/><path d="M4 12h16"/><circle cx="8" cy="19.5" r="1.4" fill="currentColor" stroke="none"/><circle cx="16" cy="19.5" r="1.4" fill="currentColor" stroke="none"/></svg>
+          Ruter
+        </div>
+
+        <div class="app-key" data-action="view" data-view="weather">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="9" r="3.2"/><path d="M13 17.5a3.5 3.5 0 0 0-1-6.85A5.5 5.5 0 0 0 2.6 12"/><path d="M13 17.5h6.2a2.8 2.8 0 0 0 .3-5.58"/></svg>
+          Vær
+        </div>
+
+        <div class="app-key" data-action="app" data-app="youtubemusic://" data-url="https://music.youtube.com">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V6l11-2v12"/><circle cx="6.5" cy="18" r="2.5"/><circle cx="17.5" cy="16" r="2.5"/></svg>
+          Musikk
+        </div>
+
+        <div class="app-key" data-action="link" data-url="https://radio.nrk.no">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="10" width="18" height="10" rx="2"/><circle cx="8" cy="15" r="2"/><path d="M14 13h4M14 17h2"/><path d="M7 10l3-6 3 3"/></svg>
+          Radio
+        </div>
+
+        <div class="app-key" data-action="view" data-view="phone">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3 19.5 19.5 0 0 1-6-6 19.8 19.8 0 0 1-3-8.7A2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .3 2 .7 3a2 2 0 0 1-.5 2L8 10a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2-.5c1 .4 2 .6 3 .7a2 2 0 0 1 1.7 2z"/></svg>
+          Telefon
+        </div>
+
+        <div class="app-key" data-action="link" data-url="sms:">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H8l-5 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+          Meldinger
+        </div>
+
+        <div class="app-key" data-action="app" data-app="vipps://" data-url="https://vipps.no">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="7" width="18" height="12" rx="2.5"/><path d="M3 10.5h18"/><circle cx="16" cy="15" r="1.1" fill="currentColor" stroke="none"/></svg>
+          Vipps
+        </div>
+
+        <div class="app-key" data-action="view" data-view="calc">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="2" width="16" height="20" rx="2.5"/><path d="M8 7h8"/><path d="M8 12h.01M12 12h.01M16 12h.01M8 16h.01M12 16h.01M16 16h.01"/></svg>
+          Kalkulator
+        </div>
+
+        <div class="app-key" data-action="view" data-view="list">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 8h.01M8 12h.01M8 16h.01"/><path d="M11 8h5M11 12h5M11 16h5"/></svg>
+          Handleliste
+        </div>
+
+        <div class="app-key" data-action="view" data-view="timer">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l3 2"/><path d="M9 2h6"/></svg>
+          Nedtelling
+        </div>
+
+        <div class="app-key" data-action="view" data-view="emergency">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 8v8M8 12h8"/></svg>
+          Nødnummer
+        </div>
+      </div>
+    </div>
+
+    <!-- WEATHER VIEW -->
+    <div id="view-weather" class="view">
+      <div class="subview-header">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="9" r="3.2"/><path d="M13 17.5a3.5 3.5 0 0 0-1-6.85A5.5 5.5 0 0 0 2.6 12"/><path d="M13 17.5h6.2a2.8 2.8 0 0 0 .3-5.58"/></svg>
+        <span>Oslo</span>
+      </div>
+      <div class="weather-big">
+        <div class="emoji" id="w-emoji">⛅</div>
+        <div class="temp" id="w-temp">--°</div>
+        <div class="desc" id="w-desc">henter …</div>
+      </div>
+      <div class="weather-sub">
+        <span id="w-wind">vind --</span>
+        <span id="w-updated">--:--</span>
+      </div>
+      <div class="forecast-row" id="forecast-row"></div>
+    </div>
+
+    <!-- CALCULATOR VIEW -->
+    <div id="view-calc" class="view">
+      <div class="subview-header">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="2" width="16" height="20" rx="2.5"/><path d="M8 7h8"/></svg>
+        <span>Kalkulator</span>
+      </div>
+      <div class="calc-display" id="calc-display">0</div>
+      <div class="calc-grid" id="calc-grid">
+        <div class="calc-key op" data-k="C">C</div>
+        <div class="calc-key op" data-k="±">±</div>
+        <div class="calc-key op" data-k="%">%</div>
+        <div class="calc-key op" data-k="÷">÷</div>
+
+        <div class="calc-key" data-k="7">7</div>
+        <div class="calc-key" data-k="8">8</div>
+        <div class="calc-key" data-k="9">9</div>
+        <div class="calc-key op" data-k="×">×</div>
+
+        <div class="calc-key" data-k="4">4</div>
+        <div class="calc-key" data-k="5">5</div>
+        <div class="calc-key" data-k="6">6</div>
+        <div class="calc-key op" data-k="-">−</div>
+
+        <div class="calc-key" data-k="1">1</div>
+        <div class="calc-key" data-k="2">2</div>
+        <div class="calc-key" data-k="3">3</div>
+        <div class="calc-key op" data-k="+">+</div>
+
+        <div class="calc-key wide" data-k="0">0</div>
+        <div class="calc-key" data-k=".">.</div>
+        <div class="calc-key op" data-k="=">=</div>
+      </div>
+    </div>
+
+    <!-- PHONE / FAVORITES VIEW -->
+    <div id="view-phone" class="view">
+      <div class="subview-header">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3 19.5 19.5 0 0 1-6-6 19.8 19.8 0 0 1-3-8.7A2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .3 2 .7 3a2 2 0 0 1-.5 2L8 10a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2-.5c1 .4 2 .6 3 .7a2 2 0 0 1 1.7 2z"/></svg>
+        <span>Telefon</span>
+      </div>
+      <div class="fav-grid" id="fav-grid"></div>
+      <a class="dial-btn" href="tel:">Åpne telefon-appen</a>
+    </div>
+
+    <!-- EMERGENCY VIEW -->
+    <div id="view-emergency" class="view">
+      <div class="subview-header">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 8v8M8 12h8"/></svg>
+        <span>Nødnummer</span>
+      </div>
+      <div class="emergency-grid">
+        <a class="emergency-btn em-politi" href="tel:112"><span class="num">112</span><span class="lbl">Politi</span></a>
+        <a class="emergency-btn em-brann" href="tel:110"><span class="num">110</span><span class="lbl">Brann</span></a>
+        <a class="emergency-btn em-ambulanse" href="tel:113"><span class="num">113</span><span class="lbl">Ambulanse</span></a>
+        <a class="emergency-btn em-legevakt" href="tel:116117"><span class="num">116117</span><span class="lbl">Legevakt</span></a>
+      </div>
+    </div>
+
+    <!-- SHOPPING LIST VIEW -->
+    <div id="view-list" class="view">
+      <div class="subview-header">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 8h.01M8 12h.01M8 16h.01"/><path d="M11 8h5M11 12h5M11 16h5"/></svg>
+        <span>Handleliste</span>
+      </div>
+      <div class="list-add-row">
+        <input id="list-input" type="text" placeholder="Legg til vare …" autocomplete="off">
+        <button id="list-add-btn">+</button>
+      </div>
+      <ul class="list-items" id="list-items"></ul>
+    </div>
+
+    <!-- TIMER VIEW -->
+    <div id="view-timer" class="view">
+      <div class="subview-header">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l3 2"/><path d="M9 2h6"/></svg>
+        <span>Nedtelling</span>
+      </div>
+      <div class="timer-display" id="timer-display">05:00</div>
+      <div class="timer-presets">
+        <button data-min="1">1m</button>
+        <button data-min="3">3m</button>
+        <button data-min="5">5m</button>
+        <button data-min="10">10m</button>
+        <button data-min="15">15m</button>
+      </div>
+      <div class="timer-controls">
+        <button id="timer-start">Start</button>
+        <button id="timer-reset">Nullstill</button>
+      </div>
+      <div class="timer-note">Virker mens skjermen er på og appen er åpen</div>
+    </div>
+
+  </div>
+
+  <div class="softkeys">
+    <button class="softkey" id="btn-back">Tilbake</button>
+    <button class="home-btn" id="btn-home" aria-label="Hjem"></button>
+    <span style="width:52px"></span>
+  </div>
+
+  <div class="credit">laget med ♡</div>
+</div>
+
+<script>
+  // ---------- View switching ----------
+  const views = {
+    home: document.getElementById('view-home'),
+    weather: document.getElementById('view-weather'),
+    calc: document.getElementById('view-calc'),
+    phone: document.getElementById('view-phone'),
+    emergency: document.getElementById('view-emergency'),
+    list: document.getElementById('view-list'),
+    timer: document.getElementById('view-timer'),
+  };
+  const backBtn = document.getElementById('btn-back');
+
+  function showView(name){
+    Object.values(views).forEach(v => v.classList.remove('active'));
+    views[name].classList.add('active');
+    backBtn.style.visibility = name === 'home' ? 'hidden' : 'visible';
+  }
+  showView('home');
+
+  document.getElementById('btn-home').addEventListener('click', () => showView('home'));
+  backBtn.addEventListener('click', () => showView('home'));
+
+  // Tries the app's own URL scheme first (opens the real app if it's
+  // installed). If nothing takes over the screen within ~1.2s, we assume
+  // the scheme didn't work and fall back to the website instead.
+  function openAppOrWeb(appUrl, webUrl){
+    let handedOff = false;
+    const onHide = () => { handedOff = true; };
+    document.addEventListener('visibilitychange', onHide);
+    window.location.href = appUrl;
+    setTimeout(() => {
+      document.removeEventListener('visibilitychange', onHide);
+      if (!handedOff) window.location.href = webUrl;
+    }, 1200);
+  }
+
+  document.getElementById('bus-mini').addEventListener('click', (e) => {
+    const el = e.currentTarget;
+    openAppOrWeb(el.dataset.app, el.dataset.url);
+  });
+
+  document.querySelectorAll('.app-key').forEach(key => {
+    key.addEventListener('click', () => {
+      const action = key.dataset.action;
+      if (action === 'link') {
+        window.location.href = key.dataset.url;
+      } else if (action === 'app') {
+        openAppOrWeb(key.dataset.app, key.dataset.url);
+      } else if (action === 'view') {
+        showView(key.dataset.view);
+      }
+    });
+  });
+
+  // ---------- Clock ----------
+  const dayNames = ['søndag','mandag','tirsdag','onsdag','torsdag','fredag','lørdag'];
+  const monthNames = ['januar','februar','mars','april','mai','juni','juli','august','september','oktober','november','desember'];
+
+  function pad(n){ return n < 10 ? '0'+n : ''+n; }
+
+  function tick(){
+    const now = new Date();
+    const timeStr = pad(now.getHours()) + ':' + pad(now.getMinutes());
+    document.getElementById('clock-time').textContent = timeStr;
+    document.getElementById('status-time').textContent = timeStr;
+    document.getElementById('clock-date').textContent =
+      dayNames[now.getDay()] + ' ' + now.getDate() + '. ' + monthNames[now.getMonth()];
+  }
+  tick();
+  setInterval(tick, 1000 * 10);
+
+  // ---------- Weather (Open-Meteo, no key needed) ----------
+  const OSLO = { lat: 59.9139, lon: 10.7522 };
+
+  function weatherInfo(code){
+    if (code === 0) return { emoji:'☀️', desc:'klarvær' };
+    if ([1,2].includes(code)) return { emoji:'🌤️', desc:'lettskyet' };
+    if (code === 3) return { emoji:'☁️', desc:'overskyet' };
+    if ([45,48].includes(code)) return { emoji:'🌫️', desc:'tåke' };
+    if ([51,53,55,56,57].includes(code)) return { emoji:'🌦️', desc:'yr' };
+    if ([61,63,65,66,67,80,81,82].includes(code)) return { emoji:'🌧️', desc:'regn' };
+    if ([71,73,75,77,85,86].includes(code)) return { emoji:'❄️', desc:'snø' };
+    if ([95,96,99].includes(code)) return { emoji:'⛈️', desc:'tordenvær' };
+    return { emoji:'⛅', desc:'variabelt' };
+  }
+
+  const shortDayNames = ['søn','man','tir','ons','tor','fre','lør'];
+
+  async function loadWeather(){
+    try {
+      const url = `https://api.open-meteo.com/v1/forecast?latitude=${OSLO.lat}&longitude=${OSLO.lon}&current_weather=true&daily=weathercode,temperature_2m_max,temperature_2m_min&timezone=Europe%2FOslo`;
+      const res = await fetch(url);
+      const data = await res.json();
+      const cw = data.current_weather;
+      const info = weatherInfo(cw.weathercode);
+      const temp = Math.round(cw.temperature);
+
+      document.getElementById('weather-mini-text').textContent = `Oslo ${temp}°`;
+      document.querySelector('#weather-mini .ic').textContent = info.emoji;
+
+      document.getElementById('w-emoji').textContent = info.emoji;
+      document.getElementById('w-temp').textContent = temp + '°';
+      document.getElementById('w-desc').textContent = info.desc;
+      document.getElementById('w-wind').textContent = 'vind ' + Math.round(cw.windspeed) + ' km/t';
+      const t = cw.time ? cw.time.slice(11,16) : '';
+      document.getElementById('w-updated').textContent = 'kl ' + t;
+
+      const daily = data.daily;
+      if (daily && daily.time) {
+        const rows = daily.time.slice(1, 4).map((dateStr, i) => {
+          const idx = i + 1;
+          const d = new Date(dateStr);
+          const dInfo = weatherInfo(daily.weathercode[idx]);
+          const hi = Math.round(daily.temperature_2m_max[idx]);
+          const lo = Math.round(daily.temperature_2m_min[idx]);
+          return `<div class="forecast-day">
+            <span>${shortDayNames[d.getDay()]}</span>
+            <span class="ic">${dInfo.emoji}</span>
+            <span class="hi">${hi}°</span>
+            <span class="lo">${lo}°</span>
+          </div>`;
+        }).join('');
+        document.getElementById('forecast-row').innerHTML = rows;
+      }
+    } catch (e) {
+      document.getElementById('weather-mini-text').textContent = 'Vær utilgjengelig';
+      document.getElementById('w-desc').textContent = 'fikk ikke kontakt';
+    }
+  }
+  loadWeather();
+  setInterval(loadWeather, 1000 * 60 * 15);
+
+  // ---------- Phone favorites (speed dial) ----------
+  // Fill this in with real names + numbers and they'll show up as big
+  // one-tap call buttons. Leave it empty to just show the setup message.
+  const FAVORITES = [
+    { name: "Hadidi", number: "+4740194760", initial: "H" },
+  ];
+
+  function renderFavorites(){
+    const grid = document.getElementById('fav-grid');
+    if (FAVORITES.length === 0) {
+      grid.innerHTML = `<div class="setup-note"><span class="big">📇</span>
+        <span>Ingen favoritter lagt til ennå.<br>Åpne telefon-appen under for å ringe.</span></div>`;
+      return;
+    }
+    grid.innerHTML = FAVORITES.map(f => `
+      <a class="fav-btn" href="tel:${f.number}">
+        <span class="avatar">${f.initial}</span>
+        <span>${f.name}<small>${f.number}</small></span>
+      </a>
+    `).join('');
+  }
+  renderFavorites();
+
+  // ---------- Bus/T-bane departures (Entur, free, no key needed) ----------
+  // Kringsjå T-bane's real-world coordinates — Entur resolves the nearest
+  // stop place ID from these at runtime, so there's no ID to keep in sync.
+  const HOME_STOP = { name: 'Kringsjå', lat: 59.9636, lon: 10.7347 };
+  let stopId = null;
+
+  async function resolveStopId(){
+    if (stopId) return stopId;
+    const query = `{
+      nearest(latitude: ${HOME_STOP.lat}, longitude: ${HOME_STOP.lon}, maximumDistance: 300, filterByPlaceTypes: [stopPlace]) {
+        edges { node { place { ... on StopPlace { id name } } } }
+      }
+    }`;
+    const res = await fetch('https://api.entur.io/journey-planner/v3/graphql', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'ET-Client-Name': 'lavins-phone' },
+      body: JSON.stringify({ query })
+    });
+    const data = await res.json();
+    const edge = data.data && data.data.nearest.edges[0];
+    if (edge) stopId = edge.node.place.id;
+    return stopId;
+  }
+
+  async function loadDepartures(){
+    const busText = document.getElementById('bus-mini-text');
+    try {
+      const id = await resolveStopId();
+      if (!id) { busText.textContent = 'Fant ikke holdeplass'; return; }
+      const query = `{
+        stopPlace(id: "${id}") {
+          estimatedCalls(numberOfDepartures: 1) {
+            expectedDepartureTime
+            destinationDisplay { frontText }
+            serviceJourney { line { publicCode } }
+          }
+        }
+      }`;
+      const res = await fetch('https://api.entur.io/journey-planner/v3/graphql', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'ET-Client-Name': 'lavins-phone' },
+        body: JSON.stringify({ query })
+      });
+      const data = await res.json();
+      const call = data.data.stopPlace.estimatedCalls[0];
+      if (!call) { busText.textContent = 'Ingen avganger'; return; }
+      const mins = Math.round((new Date(call.expectedDepartureTime) - new Date()) / 60000);
+      const line = call.serviceJourney.line.publicCode;
+      busText.textContent = `${line} → ${call.destinationDisplay.frontText} · ${mins} min`;
+    } catch (e) {
+      busText.textContent = 'Fikk ikke avganger';
+    }
+  }
+  loadDepartures();
+  setInterval(loadDepartures, 1000 * 30);
+
+  // ---------- Shopping list (saved on this phone only) ----------
+  const LIST_KEY = 'lavins-phone-list';
+
+  function loadList(){
+    try { return JSON.parse(localStorage.getItem(LIST_KEY)) || []; }
+    catch(e){ return []; }
+  }
+  function saveList(items){
+    localStorage.setItem(LIST_KEY, JSON.stringify(items));
+  }
+  function renderList(){
+    const items = loadList();
+    const ul = document.getElementById('list-items');
+    if (items.length === 0) {
+      ul.innerHTML = `<div class="list-empty">Listen er tom</div>`;
+      return;
+    }
+    ul.innerHTML = items.map((it, i) => `
+      <li class="${it.done ? 'checked' : ''}" data-i="${i}">
+        <span class="chk"></span>
+        <span class="txt">${it.text}</span>
+        <span class="del">✕</span>
+      </li>
+    `).join('');
+  }
+  document.getElementById('list-add-btn').addEventListener('click', addListItem);
+  document.getElementById('list-input').addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') addListItem();
+  });
+  function addListItem(){
+    const input = document.getElementById('list-input');
+    const text = input.value.trim();
+    if (!text) return;
+    const items = loadList();
+    items.push({ text, done: false });
+    saveList(items);
+    input.value = '';
+    renderList();
+  }
+  document.getElementById('list-items').addEventListener('click', (e) => {
+    const li = e.target.closest('li');
+    if (!li) return;
+    const i = Number(li.dataset.i);
+    const items = loadList();
+    if (e.target.classList.contains('del')) {
+      items.splice(i, 1);
+    } else {
+      items[i].done = !items[i].done;
+    }
+    saveList(items);
+    renderList();
+  });
+  renderList();
+
+  // ---------- Timer ----------
+  let timerSeconds = 5 * 60;
+  let timerTotal = 5 * 60;
+  let timerRunning = false;
+  let timerInterval = null;
+
+  function renderTimer(){
+    const m = Math.floor(timerSeconds / 60);
+    const s = timerSeconds % 60;
+    document.getElementById('timer-display').textContent = pad(m) + ':' + pad(s);
+  }
+
+  function beep(){
+    try {
+      const ctx = new (window.AudioContext || window.webkitAudioContext)();
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.connect(gain); gain.connect(ctx.destination);
+      osc.frequency.value = 880;
+      gain.gain.setValueAtTime(0.2, ctx.currentTime);
+      osc.start();
+      osc.stop(ctx.currentTime + 0.4);
+    } catch(e) {}
+    if (navigator.vibrate) navigator.vibrate([200, 100, 200, 100, 200]);
+  }
+
+  document.querySelectorAll('.timer-presets button').forEach(btn => {
+    btn.addEventListener('click', () => {
+      clearInterval(timerInterval);
+      timerRunning = false;
+      document.getElementById('timer-start').textContent = 'Start';
+      timerTotal = Number(btn.dataset.min) * 60;
+      timerSeconds = timerTotal;
+      renderTimer();
+    });
+  });
+
+  document.getElementById('timer-start').addEventListener('click', (e) => {
+    if (timerRunning) {
+      clearInterval(timerInterval);
+      timerRunning = false;
+      e.target.textContent = 'Start';
+      return;
+    }
+    if (timerSeconds <= 0) timerSeconds = timerTotal;
+    timerRunning = true;
+    e.target.textContent = 'Pause';
+    timerInterval = setInterval(() => {
+      timerSeconds--;
+      renderTimer();
+      if (timerSeconds <= 0) {
+        clearInterval(timerInterval);
+        timerRunning = false;
+        document.getElementById('timer-start').textContent = 'Start';
+        beep();
+      }
+    }, 1000);
+  });
+
+  document.getElementById('timer-reset').addEventListener('click', () => {
+    clearInterval(timerInterval);
+    timerRunning = false;
+    document.getElementById('timer-start').textContent = 'Start';
+    timerSeconds = timerTotal;
+    renderTimer();
+  });
+  renderTimer();
+
+  // ---------- Calculator ----------
+  let calcExpr = '';
+  let calcJustEvaluated = false;
+  const display = document.getElementById('calc-display');
+
+  function opSymbolToJs(s){
+    return s.replace(/×/g,'*').replace(/÷/g,'/').replace(/−/g,'-');
+  }
+
+  function renderCalc(){
+    display.textContent = calcExpr === '' ? '0' : calcExpr;
+  }
+
+  document.getElementById('calc-grid').addEventListener('click', (e) => {
+    const key = e.target.closest('.calc-key');
+    if (!key) return;
+    const k = key.dataset.k;
+
+    if (k === 'C') {
+      calcExpr = '';
+    } else if (k === '±') {
+      if (calcExpr) calcExpr = calcExpr.startsWith('-') ? calcExpr.slice(1) : '-' + calcExpr;
+    } else if (k === '%') {
+      try { calcExpr = String(parseFloat(opSymbolToJs(calcExpr)) / 100); } catch(e){}
+    } else if (k === '=') {
+      try {
+        // eslint-disable-next-line no-eval
+        const result = Function('"use strict";return (' + opSymbolToJs(calcExpr) + ')')();
+        calcExpr = String(Math.round(result * 1e8) / 1e8);
+        calcJustEvaluated = true;
+      } catch(e) {
+        calcExpr = 'feil';
+      }
+    } else {
+      if (calcJustEvaluated && !isNaN(k)) { calcExpr = ''; }
+      calcJustEvaluated = false;
+      calcExpr += k;
+    }
+    renderCalc();
+  });
+  renderCalc();
+</script>
+
+</body>
+</html>
